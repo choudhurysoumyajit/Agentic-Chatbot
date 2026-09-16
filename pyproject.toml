@@ -7,7 +7,9 @@ authors = [
     { name = "Soumyajit Choudhury", email = "choudhurysoumyajit@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "langchain>=1.4.1",
+]
 
 [project.scripts]
 agentic-chatbot = "agentic_chatbot:main"
