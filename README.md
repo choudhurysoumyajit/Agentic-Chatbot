@@ -1,79 +1,77 @@
 # Agentic Chatbot
 
-A small LangGraph and Groq proof of concept for building a stateful chatbot workflow in Python.
+A small LangGraph + Groq proof of concept for building a stateful chatbot workflow in Python.
 
 ## Current Progress
 
-- Added a working Streamlit frontend in [`app.py`](app.py) for a simple chat UI.
-- Added the LangGraph chatbot backend in [`agentic_chatbot_backend.py`](agentic_chatbot_backend.py).
-- Loads environment variables with `python-dotenv` and reads the Groq API key from `.env`.
-- Connects to Groq through LangChain's `ChatGroq` integration using the `openai/gpt-oss-20b` model.
-- Defines a typed graph state containing a message history and uses `add_messages` to merge chat history correctly.
-- Uses a single `chat_node` that sends the current conversation to the model and appends the response.
-- Compiles the graph with `START -> chat_node -> END`.
-- Adds LangGraph's in-memory `MemorySaver` checkpointer to support persistent state within the running session.
-- Associates the conversation with a configurable `thread_id`, which is used when invoking the graph.
-- Includes a working app entry point for local testing and UI interaction.
+- Added a Streamlit chat interface in [app.py](app.py).
+- Added the LangGraph chatbot backend in [agentic_chatbot_backend.py](agentic_chatbot_backend.py).
+- Successfully configured the app to load environment variables through `python-dotenv`.
+- Integrated LangChain's `ChatGroq` with the `openai/gpt-oss-20b` model.
+- Built a typed graph state using `TypedDict` and `add_messages` for message history merging.
+- Added a `chat_node` that sends the conversation to the LLM and returns the model response.
+- Compiled the graph using `START -> chat_node -> END`.
+- Added `MemorySaver` for in-memory conversation persistence within a session.
+- Added a configurable `thread_id` pattern for graph invocation.
 
-The core workflow is now implemented in the Python files rather than only in the notebook. The package entry point in [`src/agentic_chatbot/__init__.py`](src/agentic_chatbot/__init__.py) is still a scaffold and can be completed later.
+This is now a working prototype that can be run locally as a simple conversational app.
 
 ## Requirements
 
 - Python 3.12 or newer
-- [`uv`](https://docs.astral.sh/uv/)
-- A Groq API key
+- [uv](https://docs.astral.sh/uv/)
+- A valid Groq API key
 
 ## Setup
 
-Install the project dependencies:
+Install dependencies:
 
 ```bash
 uv sync
 ```
 
-Create a `.env` file in the project root and add your Groq API key:
+Create a `.env` file in the project root:
 
 ```env
 GROQ_API_KEY=your-groq-api-key
 ```
 
-Do not commit `.env` or expose the API key in the notebook.
+Do not commit this file to version control.
 
 ## Run the App
 
-Create a `.env` file in the project root with your Groq API key:
-
-```env
-GROQ_API_KEY=your-groq-api-key
-```
-
-Then start the Streamlit app:
+Start the Streamlit UI:
 
 ```bash
 uv run streamlit run app.py
 ```
 
-This launches the chat UI, where you can type a prompt and receive a response from the LangGraph chatbot backend.
+Type a prompt in the chat box and the app will send it to the LangGraph chatbot backend.
 
-## Notebook Workflow
+## Important Notes
 
-The earlier prototype still exists in [`chatbot_workflow.ipynb`](chatbot_workflow.ipynb). It remains useful for experimenting with the graph flow, but the project now also includes a runnable app-based version.
+- The app currently expects a valid `GROQ_API_KEY` in the environment.
+- `st.chat_input()` returns `None` when there is no submitted message, so the app should guard against empty input before creating a `HumanMessage`.
+- The notebook prototype in [chatbot_workflow.ipynb](chatbot_workflow.ipynb) is still useful for experimenting with the graph flow, but the Python app is the main runnable version.
 
 ## Project Structure
 
 ```text
 .
-├── chatbot_workflow.ipynb     # Current chatbot prototype
-├── pyproject.toml              # Project metadata and dependencies
+├── app.py                        # Streamlit chatbot UI
+├── agentic_chatbot_backend.py    # LangGraph + Groq backend
+├── chatbot_workflow.ipynb        # Notebook prototype
+├── pyproject.toml                # Project metadata and dependencies
+├── README.md                     # Project documentation
 └── src/
-	└── agentic_chatbot/
-		└── __init__.py         # Package entry point scaffold
+    └── agentic_chatbot/
+        └── __init__.py          # Package scaffold
 ```
 
 ## Next Steps
 
-- Move the notebook workflow into the package source.
-- Add tests for graph state updates, thread isolation, and chatbot responses.
-- Add configuration and error handling for missing API credentials.
-- Replace `MemorySaver` with a durable checkpointer for persistence across restarts.
-- Decide whether to expose the interactive chatbot through the package CLI.
+- Add input validation for empty or `None` chat submissions.
+- Add error handling for missing or invalid Groq credentials.
+- Add tests for state updates and thread behavior.
+- Move the prototype into a cleaner package structure.
+- Replace the in-memory checkpointer with a durable storage option for production use.
